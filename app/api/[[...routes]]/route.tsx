@@ -37,7 +37,7 @@ app.frame('/', (c) => {
         <div
           style={{
             color: 'white',
-            fontSize: 60,
+            fontSize: 50,
             fontStyle: 'normal',
             letterSpacing: '-0.025em',
             lineHeight: 1.4,
@@ -45,7 +45,7 @@ app.frame('/', (c) => {
             padding: '0 120px',
             whiteSpace: 'pre-wrap',
           }}
-        > 🎥 What should I watch today? 🍿
+        > 🎥 What movie should I watch today? 🍿
         </div>
       </div>
     ),
@@ -97,7 +97,7 @@ app.frame('/mood', async (c) => {
             whiteSpace: 'pre-wrap',
           }}
         >
-          How are you feeling today? 🤔
+          How are you feeling? 🤔
         </div>
       </div>
     ),
@@ -299,13 +299,18 @@ app.frame('/region/:genre', async (c) => {
   })
 })
 
-app.frame('/last/:genre/:year', async (c) => {
+app.frame('/last/:genre/:year/:region?', async (c) => {
   const { buttonValue } = c
 
-  let { genre, year } = c.req.param()
+  let { genre, year, region } = c.req.param()
 
-  let region = buttonValue
-
+  console.log('here')
+  let regionButtonVal = buttonValue
+  console.log('here1')
+  if (regionButtonVal != "refresh" && buttonValue) {
+    region = buttonValue
+  }
+  console.log('here2')
   if (!region) {
     region = "US"
   }
@@ -317,15 +322,18 @@ app.frame('/last/:genre/:year', async (c) => {
   if (!year) {
     year = "2024"
   }
-
+  console.log('here3')
   console.log(`genre ${genre} and year ${year} and region ${region}`)
-
+  console.log('here4')
   const movie = await GetMovie(genre, year, region)
+
+  
 
   if (!movie) {
     return ReturnUnverified(c, "No movies found, please try again")
   }
-
+  let movieId = movie.id
+  console.log('here5')
   return c.res({
     image: (
       <div
@@ -387,11 +395,25 @@ app.frame('/last/:genre/:year', async (c) => {
         <div
           style={{
             color: 'white',
+            fontSize: 30,
+            fontStyle: 'normal',
+            letterSpacing: '-0.025em',
+            lineHeight: 1.4,
+            marginTop: 10,
+            padding: '0 120px',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {`Rated ${movie.vote_average}/10`}
+        </div>
+        <div
+          style={{
+            color: 'white',
             fontSize: 50,
             fontStyle: 'normal',
             letterSpacing: '-0.025em',
             lineHeight: 1.4,
-            marginTop: 30,
+            marginTop: 20,
             padding: '0 120px',
             whiteSpace: 'pre-wrap',
           }}
@@ -407,7 +429,8 @@ app.frame('/last/:genre/:year', async (c) => {
       </div>
     ),
     intents: [
-      <Button.Link href={`https://www.themoviedb.org/movie/${movie.id}`}>View Movie</Button.Link>,
+      <Button value='refresh' action={`/last/${genre}/${year}/${region}`}>Next Movie</Button>,
+      <Button.Link href={`https://www.themoviedb.org/movie/${movieId}`}>View Movie</Button.Link>,
       <Button action='/'>Start over!</Button>,
     ],
     imageAspectRatio: "1.91:1"
