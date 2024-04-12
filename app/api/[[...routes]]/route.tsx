@@ -471,10 +471,11 @@ async function GetMovie(genre: string, year: string, region: string) {
   };
 
   const response = await fetch(url, options)
+  console.log(response)
   const jsonResp = await response.json()
   const movieResults = jsonResp.results
 
-  if (movieResults.length <= 0) {
+  if (!movieResults || movieResults.length <= 0) {
     return null
   }
 
