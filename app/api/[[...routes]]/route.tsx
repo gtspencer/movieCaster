@@ -300,17 +300,14 @@ app.frame('/region/:genre', async (c) => {
 })
 
 app.frame('/last/:genre/:year/:region?', async (c) => {
-  const { buttonValue } = c
+  const { buttonValue, frameData } = c
 
   let { genre, year, region } = c.req.param()
 
-  console.log('here')
   let regionButtonVal = buttonValue
-  console.log('here1')
   if (regionButtonVal != "refresh" && buttonValue) {
     region = buttonValue
   }
-  console.log('here2')
   if (!region) {
     region = "US"
   }
@@ -322,18 +319,16 @@ app.frame('/last/:genre/:year/:region?', async (c) => {
   if (!year) {
     year = "2024"
   }
-  console.log('here3')
-  console.log(`genre ${genre} and year ${year} and region ${region}`)
-  console.log('here4')
-  const movie = await GetMovie(genre, year, region)
 
-  
+  console.log(`fid: ${frameData?.fid} searching for genre ${genre} and year ${year} and region ${region}`)
+  const movie = await GetMovie(genre, year, region)
 
   if (!movie) {
     return ReturnUnverified(c, "No movies found, please try again")
   }
   let movieId = movie.id
-  console.log('here5')
+  console.log(`fid: ${frameData?.fid} got movie ${movie.title}`)
+
   return c.res({
     image: (
       <div
@@ -353,53 +348,39 @@ app.frame('/last/:genre/:year/:region?', async (c) => {
         <div
           style={{
             color: 'white',
-            fontSize: 30,
+            fontSize: 20,
             fontStyle: 'normal',
             letterSpacing: '-0.025em',
             lineHeight: 1.4,
-            marginTop: 10,
+            marginTop: 5,
             padding: '0 120px',
             whiteSpace: 'pre-wrap',
           }}
         >
-          {`Genre: ${genre}`}
+          {`Genre: ${genre} | Year: ${year} | Region: ${region}`}
         </div>
         <div
           style={{
             color: 'white',
-            fontSize: 30,
+            fontSize: 40,
             fontStyle: 'normal',
             letterSpacing: '-0.025em',
             lineHeight: 1.4,
-            marginTop: 10,
+            marginTop: 5,
             padding: '0 120px',
             whiteSpace: 'pre-wrap',
           }}
         >
-          {`Year: ${year}`}
+          {`${movie.title}`}
         </div>
         <div
           style={{
             color: 'white',
-            fontSize: 30,
+            fontSize: 20,
             fontStyle: 'normal',
             letterSpacing: '-0.025em',
             lineHeight: 1.4,
-            marginTop: 10,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {`Region: ${idsToCountries[region]}`}
-        </div>
-        <div
-          style={{
-            color: 'white',
-            fontSize: 30,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 10,
+            marginTop: 0,
             padding: '0 120px',
             whiteSpace: 'pre-wrap',
           }}
@@ -409,16 +390,30 @@ app.frame('/last/:genre/:year/:region?', async (c) => {
         <div
           style={{
             color: 'white',
-            fontSize: 50,
+            fontSize: 25,
             fontStyle: 'normal',
             letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 20,
+            lineHeight: 1,
+            marginTop: 5,
             padding: '0 120px',
             whiteSpace: 'pre-wrap',
           }}
         >
-          {`${movie.title}`}
+          {`${movie.overview}`}
+        </div>
+        <div
+          style={{
+            color: 'white',
+            fontSize: 25,
+            fontStyle: 'normal',
+            letterSpacing: '-0.025em',
+            lineHeight: 1,
+            marginTop: 5,
+            padding: '0 120px',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {``}
         </div>
         <br/>
         <img src={`https://image.tmdb.org/t/p/w600_and_h900_bestv2${movie.poster_path}`} style={{
@@ -484,7 +479,6 @@ async function GetMovie(genre: string, year: string, region: string) {
   }
 
   var movie = movieResults[Math.floor(Math.random()*movieResults.length)];
-  console.log(movie)
   return movie;
 }
 
