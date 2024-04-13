@@ -14,7 +14,14 @@ const app = new Frog({
   assetsPath: '/',
   basePath: '/api',
   // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
-  hub: pinata()
+  hub: {
+    apiUrl: "https://hubs.airstack.xyz",
+    fetchOptions: {
+      headers: {
+        "x-airstack-hubs": process.env.AIRSTACK_API_KEY ? process.env.AIRSTACK_API_KEY : "",
+      }
+    }
+  }
 })
 
 app.frame('/', (c) => {
